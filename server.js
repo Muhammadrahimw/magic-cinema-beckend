@@ -12,6 +12,10 @@ app.use(express.json());
 const PORT = process.env.PORT || 6060;
 app.use(router);
 
+app.get(`/`, (req, res, next) => {
+	res.send(`Welcome, you are logged in`);
+});
+
 app.use((req, res, next) => {
 	try {
 		throw new CustomError(404, `${req.url} page not found`);
