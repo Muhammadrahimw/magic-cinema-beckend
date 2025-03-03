@@ -32,3 +32,8 @@ export const signInValidator = Joi.object({
 	email: Joi.string().email().required(),
 	password: Joi.string().min(5).required(),
 });
+
+export const updatePasswordValidator = Joi.object({
+	oldPassword: Joi.string().min(5).required(),
+	newPassword: Joi.string().min(5).required(),
+});

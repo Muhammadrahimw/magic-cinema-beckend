@@ -40,13 +40,14 @@ const userSchema = new Schema(
 		},
 		birthday: {
 			type: Date,
-			validate: [
-				{
-					validator: (value) => !isNaN(new Date(value).getTime()),
-					message: "Please enter a valid date",
+			validate: {
+				validator: function (value) {
+					return /^\d{4}-\d{2}-\d{2}$/.test(value.toISOString().split("T")[0]);
 				},
-			],
+				message: "Please enter a valid date in YYYY-MM-DD format",
+			},
 		},
+
 		role: {type: String, required: true, enum: ["admin", "user"]},
 		isVerified: {type: Boolean, default: false},
 		isBlocked: {type: Boolean, default: false},
