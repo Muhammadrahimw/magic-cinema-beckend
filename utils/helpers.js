@@ -7,6 +7,7 @@ import {
 	updatedPasswordDesign,
 	verifyChangeEmailDesign,
 } from "./verify-designs.js";
+import multer from "multer";
 
 totp.options = {
 	step: 120,
@@ -66,3 +67,6 @@ export const sendChangeEmailLink = async ({name, email, token}) => {
 		),
 	});
 };
+
+const storage = multer.diskStorage({});
+export const upload = multer({storage});

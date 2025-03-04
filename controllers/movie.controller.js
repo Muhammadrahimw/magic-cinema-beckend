@@ -1,6 +1,8 @@
 import mongoose from "mongoose";
 import movieSchemas from "../schema/movie.schema.js";
 import {CustomError, ResData} from "../utils/res-helpers.js";
+import {cloudinary} from "../config/cloudinary.js";
+import fs from "fs/promises";
 
 export const getMovies = async (req, res, next) => {
 	try {
@@ -121,6 +123,24 @@ export const deleteMovie = async (req, res, next) => {
 		const deletedMovie = await movieSchemas.findByIdAndDelete(id);
 		if (!deletedMovie) throw new ResData(404, "Movie not found", null);
 		const resData = new ResData(200, "Movie deleted successfully");
+		res.status(resData.status).json(resData);
+	} catch (error) {
+		next(error);
+	}
+};
+
+export const uploadImage = async (req, res, next) => {
+	try {
+		if (!req.file) throw new CustomError(400, "File not found");
+
+		const result = await cloudinary.uploader.upload(req.file.path, {
+			folder: "magic-cinema",
+		});
+		await fs.unlink(req.file.path);
+
+		const resData = new ResData(200, "Image uploaded successfully", {
+			url: result.secure_url,
+		});
 		res.status(resData.status).json(resData);
 	} catch (error) {
 		next(error);
