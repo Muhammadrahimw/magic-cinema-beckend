@@ -1,4 +1,4 @@
-import {Schema, model} from "mongoose";
+import mongoose, {Schema, model} from "mongoose";
 
 const userSchema = new Schema(
 	{
@@ -34,10 +34,12 @@ const userSchema = new Schema(
 			required: true,
 			minlength: [5, "Password must be at least 5 characters long"],
 		},
-		orders: {
-			type: [{type: Schema.Types.ObjectId, ref: "orders"}],
-			default: [],
-		},
+		orders: [
+			{
+				id: {type: mongoose.Schema.Types.ObjectId, ref: "session"},
+				time: String,
+			},
+		],
 		birthday: {
 			type: Date,
 			validate: {

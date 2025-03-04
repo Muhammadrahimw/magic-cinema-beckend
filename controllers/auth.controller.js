@@ -11,6 +11,7 @@ import {
 import {CustomError, ResData} from "../utils/res-helpers.js";
 import bcrypt from "bcrypt";
 import {signInJwt} from "../utils/jwt.js";
+import sessionSchemas from "../schema/session.schema.js";
 
 export const signUp = async (req, res, next) => {
 	try {
@@ -256,6 +257,86 @@ export const verifyChangeEmail = async (req, res, next) => {
 		});
 
 		const resData = new ResData(200, "Email changed successfully");
+		res.status(resData.status).json(resData);
+	} catch (error) {
+		next(error);
+	}
+};
+
+export const createUserOrder = async (req, res, next) => {
+	try {
+		const {time, sessionId} = req.body;
+		const userId = req.userId;
+
+		if (!time || !sessionId)
+			throw new CustomError(400, "Time and session ID are required");
+
+		const user = await userSchemas.findById(userId);
+		if (!user) throw new CustomError(404, "User not found");
+
+		const alreadyOrdered = user.orders.some(
+			(order) => order.id.toString() === sessionId && order.time === time
+		);
+		if (alreadyOrdered)
+			throw new CustomError(
+				409,
+				"You have already booked this session at this time"
+			);
+
+		const session = await sessionSchemas.findById(sessionId);
+		if (!session) throw new CustomError(404, "Session not found");
+
+		const orderIndex = session.time.indexOf(time);
+		if (orderIndex === -1)
+			throw new CustomError(404, "Time not found in session");
+
+		if (session.places[orderIndex] > 0) {
+			session.places[orderIndex] -= 1;
+			await sessionSchemas.findByIdAndUpdate(session._id, {
+				places: session.places,
+			});
+		} else {
+			throw new CustomError(403, "No more seats available");
+		}
+
+		const updatedUser = await userSchemas.findByIdAndUpdate(
+			userId,
+			{
+				$push: {
+					orders: {id: sessionId, time: time},
+				},
+			},
+			{new: true}
+		);
+
+		const resData = new ResData(200, "Order created successfully", {
+			_id: updatedUser._id,
+			firstName: updatedUser.firstName,
+			lastName: updatedUser.lastName,
+			email: updatedUser.email,
+			orders: updatedUser.orders,
+			role: updatedUser.role,
+		});
+		res.status(resData.status).json(resData);
+	} catch (error) {
+		next(error);
+	}
+};
+
+export const getUserOrders = async (req, res, next) => {
+	try {
+		const userId = req.userId;
+		const user = await userSchemas.findById(userId);
+
+		if (!user.orders || user.orders.length === 0)
+			throw new CustomError(404, "No orders found");
+
+		const sessionIds = user.orders.map((order) => order.id);
+		const userOrders = await sessionSchemas
+			.find({_id: {$in: sessionIds}})
+			.populate("movieId");
+
+		const resData = new ResData(200, "User orders", userOrders);
 		res.status(resData.status).json(resData);
 	} catch (error) {
 		next(error);

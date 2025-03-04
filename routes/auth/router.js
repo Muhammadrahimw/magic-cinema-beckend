@@ -3,7 +3,9 @@ import {
 	changeEmail,
 	changeInfo,
 	changePassword,
+	createUserOrder,
 	forgotPassword,
+	getUserOrders,
 	signIn,
 	signUp,
 	verifyChangeEmail,
@@ -37,5 +39,7 @@ router.put(
 );
 router.post(`/change-email`, verifyToken, changeEmail);
 router.get(`/change-email-token`, verifyQueryToken, verifyChangeEmail);
+router.post(`/create-order`, verifyToken, createUserOrder);
+router.get(`/get-order`, verifyToken, getUserOrders);
 
 export {router};

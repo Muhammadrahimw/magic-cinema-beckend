@@ -4,6 +4,7 @@ import {
 	getUserMessages,
 	getUsers,
 	postManyMovies,
+	postManySessions,
 	sendUserMessage,
 } from "../../controllers/admin.controller.js";
 import {verifyAdmin, verifyToken} from "../../middleware/auth.middleware.js";
@@ -15,5 +16,6 @@ router.get(`/get-sms`, verifyAdmin, getUserMessages);
 router.post(`/send-sms`, verifyToken, sendUserMessage);
 router.put(`/edit-user/:id`, verifyAdmin, editUser);
 router.post(`/many-movies`, verifyAdmin, postManyMovies);
+router.post(`/many-sessions`, verifyAdmin, postManySessions);
 
 export {router};

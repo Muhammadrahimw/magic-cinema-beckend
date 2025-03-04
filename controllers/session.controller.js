@@ -27,12 +27,18 @@ export const getSessions = async (req, res, next) => {
 
 export const postSession = async (req, res, next) => {
 	try {
-		const {movieId, time, price, places} = req.body;
+		const {movieId, time, date, price, places} = req.body;
 
 		const movie = await movieSchemas.findById(movieId);
 		if (!movie) throw new CustomError(404, "Movie not found");
 
-		const session = await sessionSchemas.create({movieId, time, price, places});
+		const session = await sessionSchemas.create({
+			movieId,
+			time,
+			date,
+			price,
+			places,
+		});
 
 		const resData = new ResData(201, "Session created successfully", session);
 		res.status(resData.status).json(resData);

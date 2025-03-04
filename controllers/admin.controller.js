@@ -1,8 +1,10 @@
 import messagesSchemas from "../schema/messages.schema.js";
 import movieSchemas from "../schema/movie.schema.js";
+import sessionSchemas from "../schema/session.schema.js";
 import userSchemas from "../schema/user.schema.js";
 import {CustomError, ResData} from "../utils/res-helpers.js";
 import {movieValidator} from "../validator/movie.validator.js";
+import {sessionValidator} from "../validator/session.validator.js";
 
 export const getUsers = async (req, res, next) => {
 	try {
@@ -88,6 +90,32 @@ export const postManyMovies = async (req, res, next) => {
 		const newMovies = await movieSchemas.insertMany(movies);
 
 		const resData = new ResData(201, "Movies created successfully", newMovies);
+		res.status(resData.status).json(resData);
+	} catch (error) {
+		next(error);
+	}
+};
+
+export const postManySessions = async (req, res, next) => {
+	try {
+		const sessions = req.body;
+
+		if (!Array.isArray(sessions) || !sessions.length) {
+			throw new CustomError(400, "Sessions array is required");
+		}
+
+		for (const session of sessions) {
+			const {error} = sessionValidator.validate(session);
+			if (error) throw new CustomError(400, error.details[0].message);
+		}
+
+		const newSessions = await sessionSchemas.insertMany(sessions);
+
+		const resData = new ResData(
+			201,
+			"Sessions created successfully",
+			newSessions
+		);
 		res.status(resData.status).json(resData);
 	} catch (error) {
 		next(error);

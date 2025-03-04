@@ -18,8 +18,6 @@ export const verifyAdmin = (req, res, next) => {
 		const token = req.headers.authorization?.split(" ")[1];
 		if (!token) throw new CustomError(401, `Access denied. No token provided`);
 		const decoded = jwt.verify(token, process.env.SECRET_KEY);
-		console.log(decoded.role);
-
 		if (decoded.role !== "admin")
 			throw new CustomError(
 				403,
@@ -40,7 +38,6 @@ export const verifyQueryToken = (req, res, next) => {
 		const decoded = jwt.verify(token, process.env.SECRET_KEY);
 		req.userId = decoded.id;
 		if (decoded.email) req.userEmail = decoded.email;
-
 		next();
 	} catch (error) {
 		next(error);
