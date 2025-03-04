@@ -75,10 +75,9 @@ const movieSchema = new Schema(
 			min: [0, "Age limit must be a positive integer"],
 			max: [18, "Age limit must be less than or equal to 18"],
 		},
-		additionalInfoId: {
-			type: Schema.Types.ObjectId,
-			ref: "AdditionalInfo",
-			default: null,
+		comingSoon: {
+			type: Boolean,
+			default: false,
 		},
 	},
 	{

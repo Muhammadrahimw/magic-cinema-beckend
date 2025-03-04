@@ -1,6 +1,7 @@
 import {Router} from "express";
 import {
 	deleteMovie,
+	getComingSoon,
 	getMovieById,
 	getMovies,
 	postMovie,
@@ -14,6 +15,7 @@ import {upload} from "../../utils/helpers.js";
 const router = Router();
 
 router.get(`/`, getMovies);
+router.get(`/coming-soon`, getComingSoon);
 router.get(`/:id`, getMovieById);
 router.post(`/`, validateMovie, verifyAdmin, postMovie);
 router.put(`/:id`, validateMovie, verifyAdmin, updateMovie);

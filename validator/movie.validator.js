@@ -21,8 +21,5 @@ export const movieValidator = Joi.object({
 	posterUrl: Joi.string().uri().required(),
 	state: Joi.string().required().min(2),
 	ageLimit: Joi.number().required().min(0).max(18),
-	additionalInfoId: Joi.string()
-		.regex(/^[a-f\d]{24}$/i)
-		.message("additionalInfoId must be a valid MongoDB ObjectId")
-		.allow(null),
+	comingSoon: Joi.boolean().default(false),
 });
