@@ -99,6 +99,7 @@ export const signIn = async (req, res, next) => {
 			orders: user.orders,
 			role: user.role,
 			token: token,
+			...(user.birthday && {birthday: user.birthday}),
 		});
 		res.status(resData.status).json(resData);
 	} catch (error) {
@@ -332,9 +333,20 @@ export const getUserOrders = async (req, res, next) => {
 			throw new CustomError(404, "No orders found");
 
 		const sessionIds = user.orders.map((order) => order.id);
-		const userOrders = await sessionSchemas
+		const sessions = await sessionSchemas
 			.find({_id: {$in: sessionIds}})
 			.populate("movieId");
+
+		const userOrders = sessions.map((session) => {
+			const userOrder = user.orders.find(
+				(order) => order.id.toString() === session._id.toString()
+			);
+
+			return {
+				...session.toObject(),
+				time: userOrder?.time || null,
+			};
+		});
 
 		const resData = new ResData(200, "User orders", userOrders);
 		res.status(resData.status).json(resData);
