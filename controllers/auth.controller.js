@@ -53,15 +53,19 @@ export const verifyEmail = async (req, res, next) => {
 		if (!user) return next(new CustomError(404, "User not found"));
 
 		const token = signInJwt({id: user._id, role: user.role});
-		const resData = new ResData(201, "Email verified successfully", {
-			_id: user._id,
-			firstName: user.firstName,
-			lastName: user.lastName,
-			email: user.email,
-			orders: user.orders,
-			role: user.role,
-			token: token,
-		});
+		const resData = new ResData(
+			201,
+			"Your email is verified, and you're successfully registered!",
+			{
+				_id: user._id,
+				firstName: user.firstName,
+				lastName: user.lastName,
+				email: user.email,
+				orders: user.orders,
+				role: user.role,
+				token: token,
+			}
+		);
 		res.status(resData.status).json(resData);
 	} catch (error) {
 		next(error);
@@ -257,7 +261,17 @@ export const verifyChangeEmail = async (req, res, next) => {
 			email: user.email,
 		});
 
-		const resData = new ResData(200, "Email changed successfully");
+		const newUser = await userSchemas.findById(user.id);
+
+		const resData = new ResData(200, "Email changed successfully", {
+			_id: userId,
+			firstName: user.firstName,
+			lastName: user.lastName,
+			email: user.email,
+			orders: user.orders,
+			role: user.role,
+			birthday: user.birthday,
+		});
 		res.status(resData.status).json(resData);
 	} catch (error) {
 		next(error);

@@ -25,6 +25,22 @@ export const getSessions = async (req, res, next) => {
 	}
 };
 
+export const getSessionsById = async (req, res, next) => {
+	try {
+		const {id} = req.params;
+		const session = await sessionSchemas.findById(id).populate("movieId");
+
+		if (!session) {
+			return res.status(404).json({status: 404, message: "Session not found"});
+		}
+
+		const resData = new ResData(200, "Session retrieved successfully", session);
+		res.status(resData.status).json(resData);
+	} catch (error) {
+		next(error);
+	}
+};
+
 export const postSession = async (req, res, next) => {
 	try {
 		const {movieId, time, date, price, places} = req.body;
