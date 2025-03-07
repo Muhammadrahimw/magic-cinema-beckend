@@ -9,7 +9,13 @@ export const verifyToken = (req, res, next) => {
 		req.userId = decoded.id;
 		next();
 	} catch (error) {
-		next(error);
+		if (error.name === "TokenExpiredError") {
+			next(new CustomError(401, "Token expired, please login again"));
+		} else if (error.name === "JsonWebTokenError") {
+			next(new CustomError(401, "Invalid token"));
+		} else {
+			next(error);
+		}
 	}
 };
 
